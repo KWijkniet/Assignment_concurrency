@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Decoder;
 
 namespace ConcDecoder
@@ -10,10 +11,12 @@ namespace ConcDecoder
     public class ConcurrentTaskBuffer : TaskBuffer
     {
         //todo: add required fields such that satisfies a thread safe shared buffer.
+        public readonly Object mutex;
 
         public ConcurrentTaskBuffer() : base()
         {
             //todo: implement this method such that satisfies a thread safe shared buffer.
+            mutex = new object();
         }
 
         /// <summary>
@@ -23,6 +26,12 @@ namespace ConcDecoder
         public override void AddTask(TaskDecryption task)
         {
             //todo: implement this method such that satisfies a thread safe shared buffer.
+            this.taskBuffer.Enqueue(task);
+            this.numOfTasks++;
+            this.maxBuffSize = this.taskBuffer.Count > this.maxBuffSize ? this.taskBuffer.Count : this.maxBuffSize;
+
+            this.LogVisualisation();
+            this.PrintBufferSize();
         }
 
         /// <summary>
@@ -33,6 +42,15 @@ namespace ConcDecoder
         {
             //todo: implement this method such that satisfies a thread safe shared buffer.
             TaskDecryption t = null;
+            lock (this.mutex)
+            {
+                if (this.taskBuffer.Count > 0)
+                {
+                    t = this.taskBuffer.Dequeue();
+                    if (t.id < 0)
+                        this.taskBuffer.Enqueue(t);
+                }
+            }
 
             return t;
         }
@@ -43,6 +61,7 @@ namespace ConcDecoder
         public override void PrintBufferSize()
         {
             //todo: implement this method such that satisfies a thread safe shared buffer.
+            Console.Write("Buffer#{0} ; ", this.taskBuffer.Count);
         }
     }
 
@@ -61,7 +80,25 @@ namespace ConcDecoder
             ConcurrentTaskBuffer tasks = new ConcurrentTaskBuffer();
 
             //todo: implement this method such that satisfies a thread safe shared buffer.
+            Provider provider = new Provider(tasks, this.challenges);
+            provider.SendTasks();
 
+            Thread[] threads = new Thread[numOfWorkers];
+            Worker[] workers = new Worker[numOfWorkers];
+            for (int i = 0; i < numOfWorkers; i++)
+            {
+                Worker worker = new Worker(tasks);
+                threads[i] = new Thread(new ThreadStart(() => {
+                    worker.ExecuteTasks();
+                }));
+                threads[i].Start();
+                workers[i] = worker;
+            }
+
+            for (int i = 0; i < numOfWorkers; i++)
+            {
+                threads[i].Join();
+            }
 
             return tasks.GetLogs();
         }
