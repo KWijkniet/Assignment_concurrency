@@ -23,13 +23,6 @@ namespace ConcDecoder
         public override void AddTask(TaskDecryption task)
         {
             //todo: implement this method such that satisfies a thread safe shared buffer.
-            Console.WriteLine("add task programm has been called");
-            this.taskBuffer.Enqueue(task);// gooi task in queue
-            this.numOfTasks++;// tell hoeveel task
-            this.maxBuffSize = this.taskBuffer.Count > this.maxBuffSize ? this.taskBuffer.Count : this.maxBuffSize;//changing buff size depending on wat groter is
-
-            this.LogVisualisation();//idk 
-            this.PrintBufferSize();// printen van buffer
         }
 
         /// <summary>
@@ -50,7 +43,6 @@ namespace ConcDecoder
         public override void PrintBufferSize()
         {
             //todo: implement this method such that satisfies a thread safe shared buffer.
-            Console.Write("Buffer#{0} ; ", this.taskBuffer.Count);
         }
     }
 
@@ -67,13 +59,6 @@ namespace ConcDecoder
         public string ConcurrentTaskExecution(int numOfProviders, int numOfWorkers)
         {
             ConcurrentTaskBuffer tasks = new ConcurrentTaskBuffer();
-            Provider provider = new Provider(tasks, this.challenges);
-            Worker[] worker = new Worker[numOfWorkers];
-            for (int i = 0; i < numOfWorkers; i++)
-            {
-                worker[i] = new Worker(tasks);
-            }
-
 
             //todo: implement this method such that satisfies a thread safe shared buffer.
 

@@ -8,21 +8,20 @@ namespace Decoder
     // The values within WorkingParams can change during the experiments. 
     class WorkingParams
     {
-        public const string studentNumberOne = ""; // This must be filled.
+        public const string studentNumberOne = "1020159"; // This must be filled.
         public const string studentNumberTwo = ""; // This must be filled. Keep it "" if you are working alone.
         public const string classNumber = "INF2A"; // This must be filled. INF2A is just an example.
 
         public const int numOfWorkers = 40; // how many workers are needed to keep the max size of the shared buffer between 50 - 100?
-        //public const int minSendIntervalTime = 50; // min sending interval time (in msec) by the provider
-        //public const int maxSendIntervalTime = 500; // max sending interval time (in msec) by the provider
-        public const int minSendIntervalTime = 5; // min sending interval time (in msec) by the provider
-        public const int maxSendIntervalTime = 10; // max sending interval time (in msec) by the provider
+        public const int minSendIntervalTime = 50; // min sending interval time (in msec) by the provider
+        public const int maxSendIntervalTime = 500; // max sending interval time (in msec) by the provider
+        
     }
 
     // The values of FixedParams must not change in the final submission.
     class FixedParams
     {
-        public const int maxNumOfChallenges = 500; // max number of challenges to be solved from the input file
+        //public const int maxNumOfChallenges = 500; // max number of challenges to be solved from the input file
         public const int minTaskExeTime = 1000;  // min execution time (in msec) for abstract tasks
         public const int maxTaskExeTime = 3000;  // max execution time (in msec) for abstract tasks
         public const int terminatingTaskId = -1;  // the id of the terminating task: to terminate the worker(s)
@@ -34,6 +33,8 @@ namespace Decoder
         public const string inputFileName = @"/challenges.txt";
         public const string logFileName = @"/log.txt";
 
+        //only for testing
+        public const int maxNumOfChallenges = 50; // max number of challenges to be solved from the input file
     }
 
 
@@ -47,7 +48,7 @@ namespace Decoder
             Stopwatch conSW = new Stopwatch();
 
             seqSW.Start();
-            new Launch().SequentialTaskExecution();
+            //new Launch().SequentialTaskExecution();
             seqSW.Stop();
 
             TimeSpan seqET = seqSW.Elapsed;
