@@ -1,5 +1,9 @@
 ﻿using System;
 using Decoder;
+using System.Collections.Generic;
+
+
+
 
 namespace ConcDecoder
 {
@@ -10,10 +14,20 @@ namespace ConcDecoder
     public class ConcurrentTaskBuffer : TaskBuffer
     {
         //todo: add required fields such that satisfies a thread safe shared buffer.
+        protected Queue<TaskDecryption> taskBuffer;
+        protected string buffSizeLog;
+        protected int logCounter;
+        protected int numOfTasks;
+        protected int maxBuffSize;
 
         public ConcurrentTaskBuffer() : base()
         {
             //todo: implement this method such that satisfies a thread safe shared buffer.
+            this.logCounter = 0;
+            this.numOfTasks = 0;
+            this.maxBuffSize = 0;
+            this.buffSizeLog = "";
+            this.taskBuffer = new Queue<TaskDecryption>();
         }
 
         /// <summary>
@@ -23,6 +37,12 @@ namespace ConcDecoder
         public override void AddTask(TaskDecryption task)
         {
             //todo: implement this method such that satisfies a thread safe shared buffer.
+            this.taskBuffer.Enqueue(task);
+            this.numOfTasks++;
+            this.maxBuffSize = this.taskBuffer.Count > this.maxBuffSize ? this.taskBuffer.Count : this.maxBuffSize;
+
+            this.LogVisualisation();
+            this.PrintBufferSize();
         }
 
         /// <summary>
@@ -33,6 +53,12 @@ namespace ConcDecoder
         {
             //todo: implement this method such that satisfies a thread safe shared buffer.
             TaskDecryption t = null;
+            if (this.taskBuffer.Count > 0)
+            {
+                t = this.taskBuffer.Dequeue();
+                if (t.id < 0)
+                    this.taskBuffer.Enqueue(t);
+            }
 
             return t;
         }
@@ -43,6 +69,7 @@ namespace ConcDecoder
         public override void PrintBufferSize()
         {
             //todo: implement this method such that satisfies a thread safe shared buffer.
+            Console.WriteLine("Buffer#{0} ; ", this.taskBuffer.Count);
         }
     }
 
@@ -61,6 +88,18 @@ namespace ConcDecoder
             ConcurrentTaskBuffer tasks = new ConcurrentTaskBuffer();
 
             //todo: implement this method such that satisfies a thread safe shared buffer.
+            Provider provider = new Provider(tasks, challenges);
+            Worker[] workers = new Worker[numOfWorkers];
+            for (int i = 0; i < numOfWorkers; i++)
+            {
+                workers[i] = new Worker(tasks);
+            }
+            
+
+
+            provider.SendTasks();
+            
+
 
 
             return tasks.GetLogs();
